@@ -4,6 +4,7 @@ import LoginPage from './pages/Login.jsx';
 import ReportsList from './pages/ReportsList.jsx';
 import ReportDetail from './pages/ReportDetail.jsx';
 import MapView from './pages/MapView.jsx';
+import Settings from './pages/Settings.jsx';
 
 // Auth Context
 export const AuthContext = createContext(null);
@@ -60,6 +61,7 @@ function Sidebar() {
         { path: '/', icon: 'dashboard', label: 'Dashboard' },
         { path: '/reports', icon: 'list_alt', label: 'Reports' },
         { path: '/map', icon: 'map', label: 'Map View' },
+        { path: '/settings', icon: 'settings', label: 'Settings' },
     ];
 
     return (
@@ -111,6 +113,7 @@ function AppLayout() {
                     <Route path="/reports" element={<ReportsList />} />
                     <Route path="/reports/:id" element={<ReportDetail />} />
                     <Route path="/map" element={<MapView />} />
+                    <Route path="/settings" element={<Settings />} />
                 </Routes>
             </main>
         </div>

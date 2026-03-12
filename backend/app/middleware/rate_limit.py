@@ -22,7 +22,12 @@ async def init_redis():
     global _redis_client, _redis_available
     try:
         import redis.asyncio as aioredis
-        _redis_client = aioredis.from_url(settings.REDIS_URL, decode_responses=True)
+        _redis_client = aioredis.from_url(
+            settings.REDIS_URL,
+            decode_responses=True,
+            socket_timeout=3,
+            socket_connect_timeout=3,
+        )
         await _redis_client.ping()
         _redis_available = True
         logger.info("Redis connected for rate limiting")

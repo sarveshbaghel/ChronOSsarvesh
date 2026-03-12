@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     X_API_SECRET: Optional[str] = None
     X_ACCESS_TOKEN: Optional[str] = None
     X_ACCESS_TOKEN_SECRET: Optional[str] = None
+    X_BEARER_TOKEN: Optional[str] = None
+    X_AUTO_POST_ENABLED: bool = False
 
     # Firebase
     FIREBASE_PROJECT_ID: Optional[str] = None

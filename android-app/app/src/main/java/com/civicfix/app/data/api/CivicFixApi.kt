@@ -43,6 +43,16 @@ interface CivicFixApi {
         @Path("id") id: String,
     ): ReportResponse
 
+    // --- Settings ---
+    @GET("api/v1/settings")
+    suspend fun getSettings(): SettingsResponse
+
+    @PUT("api/v1/settings")
+    suspend fun updateSettings(
+        @Header("Authorization") token: String,
+        @Body request: SettingsUpdateRequest
+    ): SettingsResponse
+
     // --- Health ---
     @GET("api/v1/health")
     suspend fun health(): HealthResponse

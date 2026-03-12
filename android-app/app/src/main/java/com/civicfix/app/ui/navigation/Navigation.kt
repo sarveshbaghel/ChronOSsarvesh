@@ -9,6 +9,7 @@ import com.civicfix.app.ui.screens.SignupScreen
 import com.civicfix.app.ui.screens.HomeScreen
 import com.civicfix.app.ui.screens.ReportScreen
 import com.civicfix.app.ui.screens.HistoryScreen
+import com.civicfix.app.ui.screens.SettingsScreen
 
 sealed class Screen(val route: String) {
     object Login : Screen("login")
@@ -16,6 +17,7 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Report : Screen("report")
     object History : Screen("history")
+    object Settings : Screen("settings")
 }
 
 @Composable
@@ -59,6 +61,7 @@ fun CivicFixNavHost() {
             HomeScreen(
                 onReportClick = { navController.navigate(Screen.Report.route) },
                 onHistoryClick = { navController.navigate(Screen.History.route) },
+                onSettingsClick = { navController.navigate(Screen.Settings.route) },
                 token = token
             )
         }
@@ -74,6 +77,13 @@ fun CivicFixNavHost() {
 
         composable(Screen.History.route) {
             HistoryScreen(
+                token = token,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
+        composable(Screen.Settings.route) {
+            SettingsScreen(
                 token = token,
                 onBack = { navController.popBackStack() }
             )

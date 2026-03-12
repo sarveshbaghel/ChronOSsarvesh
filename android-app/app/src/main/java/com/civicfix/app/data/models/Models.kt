@@ -80,3 +80,14 @@ enum class IssueType(val displayName: String) {
         fun all() = values().toList()
     }
 }
+
+// --- Settings ---
+data class SettingsResponse(
+    @SerializedName("x_auto_post_enabled") val xAutoPostEnabled: Boolean,
+    @SerializedName("x_api_connected") val xApiConnected: Boolean,
+    @SerializedName("x_bearer_configured") val xBearerConfigured: Boolean
+)
+
+data class SettingsUpdateRequest(
+    @SerializedName("x_auto_post_enabled") val xAutoPostEnabled: Boolean
+)

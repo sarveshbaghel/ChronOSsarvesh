@@ -17,8 +17,9 @@ from app.middleware.auth import get_current_user, require_admin
 from app.middleware.rate_limit import check_rate_limit
 from app.services.storage import upload_image, validate_image
 from app.services.geocoding import reverse_geocode
-from app.services.complaint import generate_complaint_text, generate_tweet_text
 from app.services.social import post_to_x
+from app.services.complaint import generate_complaint_text, generate_tweet_text
+from app.routers.settings import is_auto_post_enabled
 from app.utils.audit import log_action
 
 logger = logging.getLogger("civicfix.reports")
@@ -101,6 +102,36 @@ async def create_report(
     # Audit log
     await log_action(db, "report_created", actor=identifier, report_id=report.id)
     logger.info(f"Report created: {report.id} by {identifier}")
+
+    # Auto-post to X if enabled
+    if is_auto_post_enabled():
+        try:
+            tweet_text = generate_tweet_text(
+                issue_type=issue_type,
+                description=description,
+                address=address or "",
+                latitude=latitude,
+                longitude=longitude,
+            )
+            x_result = await post_to_x(
+                complaint_text=complaint_text,
+                tweet_text=tweet_text,
+                image_url=storage_result["image_url"],
+            )
+            if x_result["posted_status"] == "posted":
+                report.posted_to_x = True
+                report.x_post_id = x_result["tweet_id"]
+            elif x_result["posted_status"] == "simulated":
+                report.posted_to_x = False
+                report.x_post_id = x_result["mock_id"]
+            await db.flush()
+            await log_action(
+                db, "auto_posted_to_x", actor="system",
+                report_id=report.id, note=x_result["message"]
+            )
+            logger.info(f"Auto-posted report {report.id} to X: {x_result['posted_status']}")
+        except Exception as e:
+            logger.warning(f"Auto-post to X failed for report {report.id}: {e}")
 
     return ReportCreateResponse(
         report_id=report.id,

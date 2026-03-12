@@ -11,6 +11,7 @@ from app.config import settings
 from app.database import init_db
 from app.middleware.rate_limit import init_redis
 from app.routers import auth, reports, health
+from app.routers import settings as settings_router
 from app.models import User
 from app.middleware.auth import hash_password
 from sqlalchemy import select
@@ -102,6 +103,7 @@ if settings.MOCK_MODE:
 app.include_router(auth.router)
 app.include_router(reports.router)
 app.include_router(health.router)
+app.include_router(settings_router.router)
 
 
 @app.get("/", tags=["Root"])

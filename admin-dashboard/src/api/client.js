@@ -62,4 +62,15 @@ export const checkHealth = async () => {
     return data;
 };
 
+// --- Settings API ---
+export const getSettings = async () => {
+    const { data } = await client.get('/api/v1/settings');
+    return data;
+};
+
+export const updateSettings = async (updates) => {
+    const { data } = await client.put('/api/v1/settings', updates);
+    return data;
+};
+
 export default client;
