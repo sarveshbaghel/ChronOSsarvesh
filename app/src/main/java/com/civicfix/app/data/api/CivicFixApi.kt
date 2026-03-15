@@ -30,6 +30,7 @@ interface CivicFixApi {
         @Part("description") description: RequestBody,
         @Part("latitude") latitude: RequestBody,
         @Part("longitude") longitude: RequestBody,
+        @Part("timestamp") timestamp: RequestBody? = null,
         @Part("device_id") deviceId: RequestBody? = null,
     ): ReportCreateResponse
 
@@ -45,6 +46,18 @@ interface CivicFixApi {
         @Header("Authorization") token: String,
         @Path("id") id: String,
     ): ReportResponse
+
+    // --- Settings ---
+    @GET("api/v1/settings")
+    suspend fun getSettings(
+        @Header("Authorization") token: String
+    ): SettingsResponse
+
+    @PUT("api/v1/settings")
+    suspend fun updateSettings(
+        @Header("Authorization") token: String,
+        @Body request: SettingsUpdateRequest
+    ): SettingsResponse
 
     // --- Health ---
     @GET("api/v1/health")

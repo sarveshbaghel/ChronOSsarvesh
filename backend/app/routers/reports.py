@@ -4,6 +4,7 @@ Core API endpoints for report CRUD and social posting
 """
 import logging
 from typing import Optional
+from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, desc
@@ -82,6 +83,14 @@ async def create_report(
         longitude=longitude,
     )
 
+    incident_date = None
+    if timestamp:
+        try:
+            # Handle standard ISO format strings ending in Z or with timezone offset
+            incident_date = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+        except ValueError:
+            logger.warning(f"Failed to parse timestamp: {timestamp}")
+
     # Create report record
     report = Report(
         user_id=user.id if user else None,
@@ -90,6 +99,7 @@ async def create_report(
         latitude=latitude,
         longitude=longitude,
         address=address,
+        incident_date=incident_date,
         image_url=storage_result["image_url"],
         thumbnail_url=storage_result.get("thumbnail_url"),
         complaint_text=complaint_text,

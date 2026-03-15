@@ -46,6 +46,10 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
+import android.app.DatePickerDialog
+import android.app.TimePickerDialog
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -62,6 +66,7 @@ fun ReportScreen(
     var latitude by remember { mutableStateOf<Double?>(null) }
     var longitude by remember { mutableStateOf<Double?>(null) }
     var locationText by remember { mutableStateOf("Tap to detect location") }
+    var incidentDateTime by remember { mutableStateOf<LocalDateTime?>(null) }
     var loading by remember { mutableStateOf(false) }
     var dropdownExpanded by remember { mutableStateOf(false) }
     var successResponse by remember { mutableStateOf<String?>(null) }
@@ -100,7 +105,13 @@ fun ReportScreen(
     // Gallery launcher
     val galleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
-    ) { uri -> uri?.let { imageUri = it } }
+    ) { uri -> 
+        uri?.let { 
+            imageUri = it 
+            // Reset so user knows to pick a time, or default to now
+            incidentDateTime = null
+        } 
+    }
 
     // Camera permission
     val cameraPermLauncher = rememberLauncherForActivityResult(
@@ -128,6 +139,7 @@ fun ReportScreen(
             CameraPreviewScreen(
                 onImageCaptured = { uri ->
                     imageUri = uri
+                    incidentDateTime = LocalDateTime.now()
                     showCamera = false
                 },
                 onError = { exc ->
@@ -218,6 +230,30 @@ fun ReportScreen(
                         Text("Gallery")
                     }
                 }
+
+                // Date/Time Selection
+                Text("Incident Time", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
+                OutlinedTextField(
+                    value = incidentDateTime?.format(DateTimeFormatter.ofPattern("MMM dd, yyyy • hh:mm a")) ?: "",
+                    onValueChange = {},
+                    readOnly = true,
+                    placeholder = { Text("Select Date & Time") },
+                    trailingIcon = {
+                        Icon(Icons.Outlined.Event, contentDescription = "Pick Date/Time", modifier = Modifier.clickable {
+                            showDateTimePicker(context) { dateTime ->
+                                incidentDateTime = dateTime
+                            }
+                        })
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            showDateTimePicker(context) { dateTime ->
+                                incidentDateTime = dateTime
+                            }
+                        },
+                    shape = RoundedCornerShape(8.dp)
+                )
 
                 // Issue Type Dropdown
                 Text("Issue Type", fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
@@ -351,6 +387,7 @@ fun ReportScreen(
                                     description = description.toRequestBody("text/plain".toMediaTypeOrNull()),
                                     latitude = latitude.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
                                     longitude = longitude.toString().toRequestBody("text/plain".toMediaTypeOrNull()),
+                                    timestamp = incidentDateTime?.let { it.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + "Z" }?.toRequestBody("text/plain".toMediaTypeOrNull())
                                 )
                                 successResponse = response.complaintText
                             } catch (e: Exception) {
@@ -461,4 +498,25 @@ private fun copyUriToFile(context: Context, uri: Uri): File {
     val file = File(context.cacheDir, "upload_${System.currentTimeMillis()}.jpg")
     file.outputStream().use { output -> inputStream.copyTo(output) }
     return file
+}
+
+fun showDateTimePicker(context: Context, onDateTimeSelected: (LocalDateTime) -> Unit) {
+    val currentDateTime = LocalDateTime.now()
+    DatePickerDialog(
+        context,
+        { _, year, month, dayOfMonth ->
+            TimePickerDialog(
+                context,
+                { _, hourOfDay, minute ->
+                    onDateTimeSelected(LocalDateTime.of(year, month + 1, dayOfMonth, hourOfDay, minute))
+                },
+                currentDateTime.hour,
+                currentDateTime.minute,
+                true
+            ).show()
+        },
+        currentDateTime.year,
+        currentDateTime.monthValue - 1,
+        currentDateTime.dayOfMonth
+    ).show()
 }

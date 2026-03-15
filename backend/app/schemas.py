@@ -81,6 +81,7 @@ class ReportResponse(BaseModel):
     latitude: float
     longitude: float
     address: Optional[str] = None
+    incident_date: Optional[datetime] = None
     image_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
     status: str

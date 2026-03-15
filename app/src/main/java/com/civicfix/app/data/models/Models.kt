@@ -65,6 +65,17 @@ data class ReportListResponse(
     @SerializedName("page_size") val pageSize: Int
 )
 
+// --- Settings ---
+data class SettingsResponse(
+    @SerializedName("x_auto_post_enabled") val xAutoPostEnabled: Boolean,
+    @SerializedName("x_api_connected") val xApiConnected: Boolean,
+    @SerializedName("x_bearer_configured") val xBearerConfigured: Boolean
+)
+
+data class SettingsUpdateRequest(
+    @SerializedName("x_auto_post_enabled") val xAutoPostEnabled: Boolean
+)
+
 // --- Health ---
 data class HealthResponse(
     val status: String,

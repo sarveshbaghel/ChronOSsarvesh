@@ -22,6 +22,8 @@ sealed class Screen(val route: String) {
     object Home : Screen("home")
     object Report : Screen("report")
     object History : Screen("history")
+    object Profile : Screen("profile")
+    object Settings : Screen("settings")
 }
 
 @Composable
@@ -94,7 +96,31 @@ fun CivicFixNavHost() {
             HomeScreen(
                 onReportClick = { navController.navigate(Screen.Report.route) },
                 onHistoryClick = { navController.navigate(Screen.History.route) },
+                onProfileClick = { navController.navigate(Screen.Profile.route) },
                 token = token
+            )
+        }
+
+        composable(Screen.Profile.route) {
+            com.civicfix.app.ui.screens.ProfileScreen(
+                onBack = { navController.popBackStack() },
+                onLogout = {
+                    FirebaseAuth.getInstance().signOut()
+                    token = null
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Home.route) { inclusive = true }
+                    }
+                },
+                onSettingsClick = {
+                    navController.navigate(Screen.Settings.route)
+                }
+            )
+        }
+
+        composable(Screen.Settings.route) {
+            com.civicfix.app.ui.screens.SettingsScreen(
+                token = token,
+                onBack = { navController.popBackStack() }
             )
         }
 

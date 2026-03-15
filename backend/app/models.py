@@ -42,6 +42,7 @@ class Report(Base):
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     address = Column(Text, nullable=True)
+    incident_date = Column(DateTime(timezone=True), nullable=True)
     image_url = Column(Text, nullable=True)
     thumbnail_url = Column(Text, nullable=True)
     status = Column(String(20), default="pending")  # pending, approved, resolved, rejected

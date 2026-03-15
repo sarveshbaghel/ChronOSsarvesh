@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -6,6 +9,13 @@ plugins {
     // Add the Google services Gradle plugin
     id("com.google.gms.google-services")
 }
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+val mapsApiKey = localProperties.getProperty("MAPS_API_KEY") ?: ""
 
 android {
     namespace = "com.civicfix.app"
@@ -23,9 +33,11 @@ android {
             useSupportLibrary = true
         }
 
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
+
         // Backend URLs - Dynamically selected by RetrofitClient
         buildConfigField("String", "EMULATOR_API_BASE_URL", "\"http://10.0.2.2:8000\"")
-        buildConfigField("String", "DEVICE_API_BASE_URL", "\"http://192.168.29.92:8000\"")
+        buildConfigField("String", "DEVICE_API_BASE_URL", "\"http://192.168.1.9:8000\"")
     }
 
     buildTypes {

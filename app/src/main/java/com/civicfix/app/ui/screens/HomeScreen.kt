@@ -22,6 +22,7 @@ import com.civicfix.app.ui.theme.PendingYellow
 fun HomeScreen(
     onReportClick: () -> Unit,
     onHistoryClick: () -> Unit,
+    onProfileClick: () -> Unit,
     token: String?
 ) {
     Scaffold(
@@ -34,6 +35,15 @@ fun HomeScreen(
                             "Help improve your community",
                             fontSize = 13.sp,
                             color = Color(0xFF94A3B8)
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onProfileClick) {
+                        Icon(
+                            Icons.Outlined.Person,
+                            contentDescription = "Profile",
+                            tint = CivicFixBlue
                         )
                     }
                 },
