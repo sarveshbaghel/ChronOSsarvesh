@@ -36,12 +36,15 @@ import java.util.Locale
 class LocationPickerActivity : ComponentActivity() {
 
     private var onPermissionGranted: (() -> Unit)? = null
+    private var onPermissionDenied: (() -> Unit)? = null
 
     private val locationPermissionRequest = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         if (permissions.values.any { it }) {
             onPermissionGranted?.invoke()
+        } else {
+            onPermissionDenied?.invoke()
         }
     }
 
@@ -62,6 +65,14 @@ class LocationPickerActivity : ComponentActivity() {
                             Manifest.permission.ACCESS_FINE_LOCATION
                         ) == PackageManager.PERMISSION_GRANTED
                     )
+                }
+
+                // Update permission state dynamically when camera state is set (after permission request)
+                LaunchedEffect(cameraPositionState) {
+                    hasLocationPermission = ContextCompat.checkSelfPermission(
+                        this@LocationPickerActivity,
+                        Manifest.permission.ACCESS_FINE_LOCATION
+                    ) == PackageManager.PERMISSION_GRANTED
                 }
 
                 // Get initial position from intent or user's current location
@@ -194,6 +205,15 @@ class LocationPickerActivity : ComponentActivity() {
         if (!hasPermission) {
             // Request permission, then retry
             onPermissionGranted = { fetchCurrentLocation(onResult) }
+            onPermissionDenied = {
+                android.widget.Toast.makeText(
+                    this,
+                    "Location permission denied. Map opened at default location.",
+                    android.widget.Toast.LENGTH_LONG
+                ).show()
+                // Default to a central India location as fallback
+                onResult(20.5937, 78.9629)
+            }
             locationPermissionRequest.launch(
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,

@@ -63,23 +63,35 @@ async def _real_post(tweet_text: str, image_bytes: bytes | None) -> dict:
 
         api = tweepy.API(auth, retry_count=3, retry_delay=5, wait_on_rate_limit=True)
 
+        client = tweepy.Client(
+            consumer_key=settings.X_API_KEY,
+            consumer_secret=settings.X_API_SECRET,
+            access_token=settings.X_ACCESS_TOKEN,
+            access_token_secret=settings.X_ACCESS_TOKEN_SECRET,
+        )
+
         # Upload image if available
         media_ids = []
         if image_bytes:
             try:
                 from io import BytesIO
-                media = api.media_upload(filename="upload.jpg", file=BytesIO(image_bytes))
-                media_ids = [media.media_id_string]
+                media = api.media_upload(
+                    filename="upload.jpg", 
+                    file=BytesIO(image_bytes),
+                    chunked=True,
+                    media_category="tweet_image"
+                )
+                media_ids = [media.media_id]
             except Exception as e:
                 logger.warning(f"Image upload to X failed: {e}")
 
         # Post tweet
         if media_ids:
-            tweet = api.update_status(status=tweet_text, media_ids=media_ids)
+            response = client.create_tweet(text=tweet_text, media_ids=media_ids)
         else:
-            tweet = api.update_status(status=tweet_text)
+            response = client.create_tweet(text=tweet_text)
 
-        tweet_id = str(tweet.id)
+        tweet_id = str(response.data['id'])
         logger.info(f"Posted to X successfully. Tweet ID: {tweet_id}")
 
         return {

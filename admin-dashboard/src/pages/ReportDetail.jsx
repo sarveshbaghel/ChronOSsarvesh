@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { getReport, updateReport, postToX } from '../api/client.js';
+import { getReport, updateReport, postToX, getFullImageUrl } from '../api/client.js';
 
 export default function ReportDetail() {
     const { id } = useParams();
@@ -101,7 +101,7 @@ export default function ReportDetail() {
                         </div>
                         <div className="detail-image">
                             {report.image_url ? (
-                                <img src={report.image_url} alt="Report evidence" />
+                                <img src={getFullImageUrl(report.image_url)} alt="Report evidence" />
                             ) : (
                                 <div style={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f1f5f9' }}>
                                     <span className="material-icons-outlined" style={{ fontSize: 48, color: '#cbd5e1' }}>image</span>

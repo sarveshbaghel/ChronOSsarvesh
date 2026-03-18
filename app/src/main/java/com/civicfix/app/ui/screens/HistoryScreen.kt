@@ -3,6 +3,7 @@ package com.civicfix.app.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -31,7 +32,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HistoryScreen(
     token: String?,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onReportClick: (String) -> Unit
 ) {
     var reports by remember { mutableStateOf<List<ReportResponse>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
@@ -120,7 +122,7 @@ fun HistoryScreen(
                     )
                 }
                 items(reports) { report ->
-                    ReportCard(report)
+                    ReportCard(report = report, onClick = { onReportClick(report.id) })
                 }
             }
         }
@@ -128,7 +130,7 @@ fun HistoryScreen(
 }
 
 @Composable
-private fun ReportCard(report: ReportResponse) {
+private fun ReportCard(report: ReportResponse, onClick: () -> Unit) {
     val statusColor = when (report.status) {
         "pending" -> PendingYellow
         "resolved" -> ResolvedGreen
@@ -154,7 +156,7 @@ private fun ReportCard(report: ReportResponse) {
     }
 
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth().clickable { onClick() },
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
@@ -166,7 +168,7 @@ private fun ReportCard(report: ReportResponse) {
             // Thumbnail
             if (report.thumbnailUrl != null || report.imageUrl != null) {
                 AsyncImage(
-                    model = report.thumbnailUrl ?: report.imageUrl,
+                    model = RetrofitClient.getFullImageUrl(report.thumbnailUrl ?: report.imageUrl),
                     contentDescription = "Report image",
                     modifier = Modifier
                         .size(64.dp)

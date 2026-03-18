@@ -24,6 +24,9 @@ sealed class Screen(val route: String) {
     object History : Screen("history")
     object Profile : Screen("profile")
     object Settings : Screen("settings")
+    object ReportDetail : Screen("report_detail/{reportId}") {
+        fun createRoute(reportId: String) = "report_detail/$reportId"
+    }
 }
 
 @Composable
@@ -135,6 +138,18 @@ fun CivicFixNavHost() {
 
         composable(Screen.History.route) {
             HistoryScreen(
+                token = token,
+                onBack = { navController.popBackStack() },
+                onReportClick = { reportId -> 
+                    navController.navigate(Screen.ReportDetail.createRoute(reportId))
+                }
+            )
+        }
+
+        composable(Screen.ReportDetail.route) { backStackEntry ->
+            val reportId = backStackEntry.arguments?.getString("reportId") ?: return@composable
+            com.civicfix.app.ui.screens.ReportDetailScreen(
+                reportId = reportId,
                 token = token,
                 onBack = { navController.popBackStack() }
             )

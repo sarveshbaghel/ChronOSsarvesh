@@ -104,6 +104,7 @@ class TwitterShareManager {
                         intent.type = "image/*"
                         intent.putExtra(Intent.EXTRA_STREAM, contentUri)
                         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        context.grantUriPermission(TWITTER_PACKAGE, contentUri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     } else {
                         intent.type = "text/plain"
                     }

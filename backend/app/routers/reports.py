@@ -272,11 +272,31 @@ async def post_report_to_x(
         longitude=report.longitude,
     )
 
+    # Fetch image bytes if available so manual posts include media
+    image_bytes = None
+    if report.image_url:
+        try:
+            if report.image_url.startswith("/mock_uploads"):
+                import os
+                file_path = f".{report.image_url}"
+                if os.path.exists(file_path):
+                    with open(file_path, "rb") as f:
+                        image_bytes = f.read()
+            elif report.image_url.startswith("http"):
+                import httpx
+                async with httpx.AsyncClient() as client:
+                    resp = await client.get(report.image_url)
+                    if resp.status_code == 200:
+                        image_bytes = resp.content
+        except Exception as e:
+            logger.warning(f"Failed to fetch image bytes for manual X post: {e}")
+
     # Post to X
     x_result = await post_to_x(
         complaint_text=report.complaint_text or "",
         tweet_text=tweet_text,
         image_url=report.image_url,
+        image_bytes=image_bytes,
     )
 
     # Update report

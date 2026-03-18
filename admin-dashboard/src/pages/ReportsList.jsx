@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { getReports } from '../api/client.js';
+import { getReports, getFullImageUrl } from '../api/client.js';
 
 const ISSUE_TYPES = ['', 'Pothole', 'Garbage', 'Broken streetlight', 'Water leakage', 'Other'];
 const STATUSES = ['', 'pending', 'approved', 'resolved', 'rejected'];
@@ -153,7 +153,7 @@ export default function ReportsList() {
                                                 <td>
                                                     {report.thumbnail_url || report.image_url ? (
                                                         <img
-                                                            src={report.thumbnail_url || report.image_url}
+                                                            src={getFullImageUrl(report.thumbnail_url || report.image_url)}
                                                             alt="Report"
                                                             className="report-thumb"
                                                             onError={(e) => { e.target.style.display = 'none'; }}

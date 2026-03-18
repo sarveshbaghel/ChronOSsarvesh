@@ -107,4 +107,12 @@ object RetrofitClient {
         .build()
 
     val api: CivicFixApi = retrofit.create(CivicFixApi::class.java)
+
+    fun getFullImageUrl(path: String?): String? {
+        if (path == null) return null
+        if (path.startsWith("http")) return path
+        val basePath = if (BASE_URL.endsWith("/")) BASE_URL.dropLast(1) else BASE_URL
+        val imagePath = if (path.startsWith("/")) path else "/$path"
+        return "$basePath$imagePath"
+    }
 }

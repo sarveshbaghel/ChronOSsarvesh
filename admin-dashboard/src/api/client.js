@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+export const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const client = axios.create({
     baseURL: API_URL,
@@ -60,6 +60,13 @@ export const postToX = async (id) => {
 export const checkHealth = async () => {
     const { data } = await client.get('/api/v1/health');
     return data;
+};
+
+// --- Utilities ---
+export const getFullImageUrl = (path) => {
+    if (!path) return null;
+    if (path.startsWith('http')) return path; // S3 or actual URL
+    return `${API_URL}${path}`;
 };
 
 // --- Settings API ---
